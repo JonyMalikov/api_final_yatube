@@ -1,14 +1,14 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAuthenticated,\
-    IsAuthenticatedOrReadOnly
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import mixins, viewsets
 from rest_framework import filters
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated, \
+    IsAuthenticatedOrReadOnly
 
-from .serializers import PostSerializer, GroupSerializer,\
-    CommentSerializer, FollowSerializer
+from posts.models import Group, Post
 from .permissions import OwnerOrReadOnly
-from posts.models import User, Post, Group
+from .serializers import CommentSerializer, FollowSerializer, \
+    GroupSerializer, PostSerializer
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
@@ -58,6 +58,4 @@ class FollowViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         return self.request.user.follower.all()
 
     def perform_create(self, serializer):
-        following = get_object_or_404(
-            User, username=self.request.data.get('following'))
-        serializer.save(user=self.request.user, following=following)
+        serializer.save(user=self.request.user)
